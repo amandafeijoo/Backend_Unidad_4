@@ -1,12 +1,17 @@
 from rest_framework import generics
 from .models import Artist, Album
 from .serializers import ArtistSerializer, AlbumSerializer
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework import viewsets
+
+
 
 #Vistas genéricas para Artist
 
-class ArtistListCreate(generics.ListCreateAPIView):
+
+class ArtistViewSet(viewsets.ModelViewSet):
     serializer_class = ArtistSerializer
 
     def get_queryset(self):
@@ -19,6 +24,7 @@ class ArtistListCreate(generics.ListCreateAPIView):
 class ArtistRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Artist.objects.all()
     serializer_class = ArtistSerializer
+    
 
 class ArtistByGenreList(generics.ListAPIView):
     serializer_class = ArtistSerializer
@@ -38,10 +44,11 @@ class PopularArtistsList(generics.ListAPIView):
 class AlbumListCreate(generics.ListCreateAPIView):
     queryset = Album.objects.all()
     serializer_class = AlbumSerializer
-
+    
 class AlbumRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Album.objects.all()
     serializer_class = AlbumSerializer
+    
 
 class AlbumByArtistList(generics.ListAPIView):
     serializer_class = AlbumSerializer
@@ -58,6 +65,7 @@ class PopularAlbumsList(generics.ListAPIView):
     
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def latest_album_by_artist(request, artist_id):
     artist = Artist.objects.get(id=artist_id)
     latest_album = artist.album_set.order_by('release_date').first()
